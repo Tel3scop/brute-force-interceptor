@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// AddToWhiteList добавляет подсеть в белый список
+// AddToWhiteList добавляет подсеть в белый список.
 func (s *serv) AddToWhiteList(ctx context.Context, subnet string) (int64, error) {
 	whiteListID, err := s.whiteListRepository.Create(ctx, model.WhiteList{Subnet: subnet})
 	if err != nil {

@@ -7,14 +7,14 @@ import (
 )
 
 const (
-	//PlaceholderDollar выражение для подстановки переменных
+	// PlaceholderDollar выражение для подстановки переменных.
 	PlaceholderDollar = "$"
 
-	//PlaceholderQuestion выражение для подстановки переменных
+	// PlaceholderQuestion выражение для подстановки переменных.
 	PlaceholderQuestion = "?"
 )
 
-// Pretty функция для человеко-читаемой визуализации sql запроса
+// Pretty функция для человеко-читаемой визуализации sql запроса.
 func Pretty(query string, placeholder string, args ...any) string {
 	for i, param := range args {
 		var value string
@@ -27,7 +27,7 @@ func Pretty(query string, placeholder string, args ...any) string {
 			value = fmt.Sprintf("%v", v)
 		}
 
-		query = strings.Replace(query, fmt.Sprintf("%s%s", placeholder, strconv.Itoa(i+1)), value, -1)
+		query = strings.ReplaceAll(query, fmt.Sprintf("%s%s", placeholder, strconv.Itoa(i+1)), value)
 	}
 
 	query = strings.ReplaceAll(query, "\t", "")

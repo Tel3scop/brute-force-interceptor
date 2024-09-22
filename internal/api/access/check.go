@@ -7,7 +7,7 @@ import (
 	accessAPI "github.com/Tel3scop/brute-force-interceptor/pkg/access_v1"
 )
 
-// TryAuth handler для проверки авторизации
+// TryAuth handler для проверки авторизации.
 func (i *Implementation) TryAuth(ctx context.Context, request *accessAPI.AuthRequest) (*accessAPI.AuthResponse, error) {
 	auth := model.Auth{
 		Login:    request.GetLogin(),

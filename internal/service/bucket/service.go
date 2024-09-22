@@ -11,7 +11,7 @@ type serv struct {
 	cfg              *config.Config
 }
 
-// NewService функция возвращает новый сервис управления бакетами
+// NewService функция возвращает новый сервис управления бакетами.
 func NewService(
 	cfg *config.Config,
 	bucketRepository repository.BucketRepository,

@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// ResetBuckets метод устанавливает последнее время использования бакета
+// ResetBuckets метод устанавливает последнее время использования бакета.
 func (s *serv) ResetBuckets(ctx context.Context, bucketKeys []string) error {
-	return s.bucketRepository.UsePipeline(ctx, func(pipe redis.Pipeliner) error {
+	return s.bucketRepository.UsePipeline(ctx, func(_ redis.Pipeliner) error {
 		for _, bucketKey := range bucketKeys {
 			if err := s.bucketRepository.Delete(ctx, bucketKey); err != nil {
 				return status.Errorf(codes.Internal, "failed to remove %s: %v", bucketKey, err)

@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Check проверяет возможность доступа
+// Check проверяет возможность доступа.
 func (s *serv) Check(ctx context.Context, auth model.Auth) error {
 	ok, err := s.whiteListRepository.IsInList(ctx, auth.IP)
 	if err != nil {

@@ -22,7 +22,7 @@ type repo struct {
 	db db.Client
 }
 
-// NewRepository создание репозитория
+// NewRepository создание репозитория.
 func NewRepository(db db.Client) repository.WhiteListRepository {
 	return &repo{db: db}
 }
@@ -94,7 +94,7 @@ func (r *repo) IsInList(ctx context.Context, ip string) (bool, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
-		return false, nil
+		return false, err
 	}
 
 	return true, nil

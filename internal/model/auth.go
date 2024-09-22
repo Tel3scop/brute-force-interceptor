@@ -27,7 +27,7 @@ func (a Auth) PasswordBucket() string {
 	return fmt.Sprintf("password:%s", a.Password)
 }
 
-func (a Auth) IpBucket() string {
+func (a Auth) IPBucket() string {
 	if a.ipBucket != "" {
 		return a.ipBucket
 	}

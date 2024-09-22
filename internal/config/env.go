@@ -13,7 +13,7 @@ type Provider interface {
 	Config() *Config
 }
 
-// Config общий конфиг
+// Config общий конфиг.
 type Config struct {
 	DebugMode   bool   `env:"DEBUG_MODE" envDefault:"false"`
 	Environment string `env:"ENV" envDefault:"local"`
@@ -24,24 +24,24 @@ type Config struct {
 	Log         Log
 }
 
-// Config возвращаем сам конфиг
+// Config возвращаем сам конфиг.
 func (c Config) Config() *Config {
 	return &c
 }
 
-// Postgres конфиг подключения к БД
+// Postgres конфиг подключения к БД.
 type Postgres struct {
 	Host               string `env:"POSTGRES_HOST" envDefault:"localhost"`
 	Port               string `env:"POSTGRES_PORT" envDefault:"5432"`
 	User               string `env:"POSTGRES_USER" envDefault:"root"`
 	Password           string `env:"POSTGRES_PASSWORD" envDefault:"password"`
-	Db                 string `env:"POSTGRES_DB" envDefault:"postgres"`
+	DB                 string `env:"POSTGRES_DB" envDefault:"postgres"`
 	SslMode            string `env:"POSTGRES_SSL_MODE" envDefault:"disable"`
 	DSN                string `env:"POSTGRES_DSN"`
 	MaxOpenConnections int    `env:"POSTGRES_MAX_OPEN_CONNS" envDefault:"100"`
 }
 
-// GRPC конфиг подключения к grpc
+// GRPC конфиг подключения к grpc.
 type GRPC struct {
 	Host     string `env:"GRPC_HOST"`
 	Port     string `env:"GRPC_PORT"`
@@ -49,7 +49,7 @@ type GRPC struct {
 	Address  string
 }
 
-// Bucket конфиг
+// Bucket конфиг.
 type Bucket struct {
 	LoginLimit    int `env:"BUCKET_LOGIN_LIMIT" envDefault:"10"`
 	PasswordLimit int `env:"BUCKET_PASSWORD_LIMIT" envDefault:"100"`
@@ -60,7 +60,7 @@ type Bucket struct {
 	TTLMin        int `env:"BUCKET_TTL" envDefault:"10"`
 }
 
-// Redis конфиг подключения к redis
+// Redis конфиг подключения к redis.
 type Redis struct {
 	Address  string
 	Host     string `env:"REDIS_HOST" envDefault:"redis"`
@@ -69,7 +69,7 @@ type Redis struct {
 	DB       int    `env:"REDIS_DB" envDefault:"0"`
 }
 
-// Log конфиг для логов
+// Log конфиг для логов.
 type Log struct {
 	FileName   string `env:"LOG_FILENAME" envDefault:"logs/app.log"`
 	Level      string `env:"LOG_LEVEL" envDefault:"info"`
@@ -80,7 +80,7 @@ type Log struct {
 	StdOut     bool   `env:"LOG_STDOUT" envDefault:"false"`
 }
 
-// New создаем новый конфиг
+// New создаем новый конфиг.
 func New() (*Config, error) {
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
@@ -97,5 +97,5 @@ func New() (*Config, error) {
 
 func buildDSN(p *Postgres) {
 	p.DSN = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-		p.User, p.Password, p.Host, p.Port, p.Db, p.SslMode)
+		p.User, p.Password, p.Host, p.Port, p.DB, p.SslMode)
 }

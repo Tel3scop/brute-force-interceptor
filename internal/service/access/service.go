@@ -13,7 +13,7 @@ type serv struct {
 	cfg                 *config.Config
 }
 
-// NewService функция возвращает новый сервис управления доступом
+// NewService функция возвращает новый сервис управления доступом.
 func NewService(
 	cfg *config.Config,
 	whiteListRepository repository.WhiteListRepository,

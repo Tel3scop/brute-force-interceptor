@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// RemoveFromBlackList удаляет подсеть из черного списка
+// RemoveFromBlackList удаляет подсеть из черного списка.
 func (s *serv) RemoveFromBlackList(ctx context.Context, subnet string) error {
 	err := s.blackListRepository.Delete(ctx, subnet)
 	if err != nil {

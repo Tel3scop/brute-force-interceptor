@@ -12,7 +12,7 @@ type pgClient struct {
 	masterDBC db.DB
 }
 
-// New создание нового экземпляра клиента DB
+// New создание нового экземпляра клиента DB.
 func New(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {

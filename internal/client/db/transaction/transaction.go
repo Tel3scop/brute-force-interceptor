@@ -13,14 +13,14 @@ type manager struct {
 	db db.Transactor
 }
 
-// NewTransactionManager создает новый менеджер транзакций, который удовлетворяет интерфейсу db.TxManager
+// NewTransactionManager создает новый менеджер транзакций, который удовлетворяет интерфейсу db.TxManager.
 func NewTransactionManager(db db.Transactor) db.TxManager {
 	return &manager{
 		db: db,
 	}
 }
 
-// transaction основная функция, которая выполняет указанный пользователем обработчик в транзакции
+// transaction основная функция, которая выполняет указанный пользователем обработчик в транзакции.
 func (m *manager) transaction(ctx context.Context, opts pgx.TxOptions, fn db.Handler) (err error) {
 	// Если это вложенная транзакция, пропускаем инициацию новой транзакции и выполняем обработчик.
 	tx, ok := ctx.Value(pg.TxKey).(pgx.Tx)

@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Reset метод сбрасывает счетчик бакета
+// Reset метод сбрасывает счетчик бакета.
 func (s *serv) Reset(ctx context.Context, bucket string) error {
 	err := s.bucketRepository.Delete(ctx, bucket)
 	if err != nil {

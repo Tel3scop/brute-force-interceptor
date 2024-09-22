@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net"
-	"net/http"
 	"sync"
 
 	"github.com/Tel3scop/brute-force-interceptor/internal/closer"
@@ -18,15 +17,13 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-// App структура приложения с сервис-провайдером и GRPC-сервером
+// App структура приложения с сервис-провайдером и GRPC-сервером.
 type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
-	httpServer      *http.Server
-	swaggerServer   *http.Server
 }
 
-// NewApp вернуть новый экземпляр приложения с зависимостями
+// NewApp вернуть новый экземпляр приложения с зависимостями.
 func NewApp(ctx context.Context) (*App, error) {
 	a := &App{}
 
@@ -38,7 +35,7 @@ func NewApp(ctx context.Context) (*App, error) {
 	return a, nil
 }
 
-// Run запуск приложения
+// Run запуск приложения.
 func (a *App) Run() error {
 	defer func() {
 		closer.CloseAll()
