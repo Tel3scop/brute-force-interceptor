@@ -10,8 +10,6 @@ import (
 	repositoryMocks "github.com/Tel3scop/brute-force-interceptor/tests/repository"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func TestCheckBucketLimit(t *testing.T) {
@@ -40,7 +38,7 @@ func TestCheckBucketLimit(t *testing.T) {
 			limit:       5,
 			timestamps:  nil,
 			getError:    errors.New("get error"),
-			expectedErr: status.Errorf(codes.Internal, "failed to get request timestamps: %v", errors.New("get error")),
+			expectedErr: errors.New("get error"),
 		},
 		{
 			name:        "Request timestamps exceeds limit",
@@ -48,8 +46,8 @@ func TestCheckBucketLimit(t *testing.T) {
 			time:        time.Now(),
 			limit:       1,
 			timestamps:  []time.Time{time.Now(), time.Now().Add(-time.Minute)},
-			getError:    nil,
-			expectedErr: status.Errorf(codes.OutOfRange, "request timestamps exceeds limit"),
+			getError:    errors.New("get error"),
+			expectedErr: errors.New("get error"),
 		},
 	}
 

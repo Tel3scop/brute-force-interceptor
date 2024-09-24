@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Tel3scop/brute-force-interceptor/internal/repository"
+	"github.com/Tel3scop/helpers/logger"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -28,6 +29,7 @@ func (r *repo) AddRequestTimestamp(ctx context.Context, bucketKey string, tStamp
 	timestamps = append(timestamps, tStamp)
 	timestampsJSON, err := json.Marshal(timestamps)
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -37,12 +39,14 @@ func (r *repo) AddRequestTimestamp(ctx context.Context, bucketKey string, tStamp
 func (r *repo) GetRequestTimestamps(ctx context.Context, bucketKey string) ([]time.Time, error) {
 	timestampsJSON, err := r.client.Get(ctx, bucketKey).Result()
 	if err != nil && !errors.Is(err, redis.Nil) {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
 	var timestamps []time.Time
 	if timestampsJSON != "" {
 		if err := json.Unmarshal([]byte(timestampsJSON), &timestamps); err != nil {
+			logger.Error(err.Error())
 			return nil, err
 		}
 	}
@@ -51,15 +55,27 @@ func (r *repo) GetRequestTimestamps(ctx context.Context, bucketKey string) ([]ti
 }
 
 func (r *repo) Delete(ctx context.Context, bucketKey string) error {
-	return r.client.Del(ctx, bucketKey).Err()
+	err := r.client.Del(ctx, bucketKey).Err()
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func (r *repo) UsePipeline(ctx context.Context, fn func(pipe redis.Pipeliner) error) error {
 	pipe := r.client.Pipeline()
 	err := fn(pipe)
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 	_, err = pipe.Exec(ctx)
-	return err
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
 }

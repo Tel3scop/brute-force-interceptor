@@ -9,6 +9,7 @@ import (
 	"github.com/Tel3scop/brute-force-interceptor/internal/client/db"
 	"github.com/Tel3scop/brute-force-interceptor/internal/model"
 	"github.com/Tel3scop/brute-force-interceptor/internal/repository"
+	"github.com/Tel3scop/helpers/logger"
 )
 
 const (
@@ -36,6 +37,7 @@ func (r *repo) Create(ctx context.Context, dto model.BlackList) (int64, error) {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
+		logger.Error(err.Error())
 		return 0, err
 	}
 
@@ -47,6 +49,7 @@ func (r *repo) Create(ctx context.Context, dto model.BlackList) (int64, error) {
 	var id int64
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id)
 	if err != nil {
+		logger.Error(err.Error())
 		return 0, err
 	}
 
@@ -60,6 +63,7 @@ func (r *repo) Delete(ctx context.Context, subnet string) error {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -69,7 +73,11 @@ func (r *repo) Delete(ctx context.Context, subnet string) error {
 	}
 
 	_, err = r.db.DB().ExecContext(ctx, q, args...)
-	return err
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	return nil
 }
 
 func (r *repo) IsInList(ctx context.Context, ip string) (bool, error) {
@@ -80,6 +88,7 @@ func (r *repo) IsInList(ctx context.Context, ip string) (bool, error) {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
+		logger.Error(err.Error())
 		return false, err
 	}
 
@@ -94,6 +103,7 @@ func (r *repo) IsInList(ctx context.Context, ip string) (bool, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
+		logger.Error(err.Error())
 		return false, err
 	}
 

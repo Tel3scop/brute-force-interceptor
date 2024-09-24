@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/Tel3scop/helpers/logger"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -11,7 +13,7 @@ import (
 func (s *serv) CheckBucketLimit(ctx context.Context, bucketKey string, time time.Time, limit int) error {
 	timestamps, err := s.GetRequestTimestamps(ctx, bucketKey)
 	if err != nil {
-		return status.Errorf(codes.Internal, "failed to get request timestamps: %v", err)
+		return err
 	}
 
 	windowStart := time.Add(-s.cfg.Bucket.WindowSize)
@@ -23,6 +25,7 @@ func (s *serv) CheckBucketLimit(ctx context.Context, bucketKey string, time time
 	}
 
 	if count > limit {
+		logger.Error("Bucket limit exceeded", zap.Int("Count", count), zap.Int("Limit", limit))
 		return status.Errorf(codes.OutOfRange, "request timestamps exceeds limit")
 	}
 	return nil
