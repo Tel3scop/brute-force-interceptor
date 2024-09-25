@@ -11,7 +11,7 @@ func (i *Implementation) RemoveFromBlacklist(
 	ctx context.Context,
 	request *accessAPI.RemoveFromBlacklistRequest,
 ) (*accessAPI.RemoveFromBlacklistResponse, error) {
-	_, err := i.accessService.AddToBlackList(ctx, request.GetSubnet())
+	err := i.accessService.RemoveFromBlackList(ctx, request.GetSubnet())
 	if err != nil {
 		return nil, err
 	}

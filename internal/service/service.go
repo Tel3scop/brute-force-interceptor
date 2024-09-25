@@ -23,4 +23,6 @@ type AccessService interface {
 	Check(ctx context.Context, auth model.Auth) error
 	AddToBlackList(ctx context.Context, subnet string) (int64, error)
 	AddToWhiteList(ctx context.Context, subnet string) (int64, error)
+	RemoveFromBlackList(ctx context.Context, subnet string) error
+	RemoveFromWhiteList(ctx context.Context, subnet string) error
 }
