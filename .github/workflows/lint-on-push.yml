@@ -42,7 +42,6 @@ jobs:
         run: go test -v ./...
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -56,7 +55,7 @@ jobs:
         run: go mod download
 
       - name: Start integration test environment with Docker Compose
-        run: docker-compose -f docker-compose.integration.yml up -d
+        run: docker compose -f docker-compose.integration.yml up -d
 
       - name: Run unit tests
         run: make test

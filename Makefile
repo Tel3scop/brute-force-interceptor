@@ -114,5 +114,5 @@ integration-test: ## run integration tests
 .PHONY: docker-build
 docker-build: ## build for CI/CD
 	docker buildx build --no-cache --platform linux/amd64 -t <REGISTRY>/access-server:v0.0.1 .
-	docker login -u <USERNAME> -p <PASSWORD> <REGISTRY>
+	docker login -u <REGISTRY_USERNAME> -p <REGISTRY_PASSWORD> <REGISTRY>
 	docker push  <REGISTRY>/access-server:v0.0.1
