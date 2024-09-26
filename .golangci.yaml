@@ -19,6 +19,12 @@ linters-settings:
           - github.com/go-redis/redis/v8
           - github.com/Tel3scop/brute-force-interceptor
           - github.com/Masterminds/squirrel
+          - github.com/Tel3scop/helpers
+          - github.com/jackc/pgx
+          - github.com/georgysavva/scany
+          - github.com/pkg/errors
+          - github.com/grpc-ecosystem
+          - github.com/spf13/cobra
 
 issues:
   exclude-rules:
