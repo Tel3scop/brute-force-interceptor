@@ -55,7 +55,7 @@ jobs:
         run: go mod download
 
       - name: Start integration test environment with Docker Compose
-        run: docker compose -f docker-compose.integration.yml up -d
+        run: docker compose -f docker-compose.integration.yaml up -d
 
       - name: Run unit tests
         run: make test
@@ -68,4 +68,4 @@ jobs:
           docker exec -i brute-force-integration_db_1 psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
 
       - name: Stop integration test environment with Docker Compose
-        run: docker compose -f docker-compose.integration.yml down
+        run: docker compose -f docker-compose.integration.yaml down
