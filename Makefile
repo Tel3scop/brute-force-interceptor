@@ -91,26 +91,6 @@ vendor-proto:
 			rm -rf vendor.protogen/openapiv2 ;\
 		fi
 
-grpc-load-test:
-	ghz \
-		--proto api/user_v1/user.proto --import-paths vendor.protogen \
-		--call user_v1.UserV1/Get \
-		--data '{"id": 1}' \
-		--rps 100 \
-		--total 10000 \
-		--insecure \
-		localhost:${GRPC_PORT}
-
-grpc-error-load-test:
-	ghz \
-		--proto api/user_v1/user.proto --import-paths vendor.protogen \
-		--call user_v1.UserV1/Get \
-		--data '{"id": 0}' \
-		--rps 100 \
-		--total 10000 \
-		--insecure \
-		localhost:${GRPC_PORT}
-
 .PHONY: mock
 mock: ### Generate mocks
 	go generate ./...
@@ -126,3 +106,13 @@ lint: ## run linter
 .PHONY: test
 test: ## run tests
 	go test ./... -race -count 100
+
+.PHONY: integration-test
+integration-test: ## run integration tests
+	go test ./... -tags=integration
+
+.PHONY: docker-build
+docker-build: ## build for CI/CD
+	docker buildx build --no-cache --platform linux/amd64 -t <REGISTRY>/access-server:v0.0.1 .
+	docker login -u <USERNAME> -p <PASSWORD> <REGISTRY>
+	docker push  <REGISTRY>/access-server:v0.0.1

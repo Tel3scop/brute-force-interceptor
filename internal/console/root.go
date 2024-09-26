@@ -31,7 +31,7 @@ func init() {
 		&serverAddress,
 		"connection",
 		"c",
-		"127.0.0.1:50051",
+		"localhost:50051",
 		"gRPC connection string",
 	)
 }

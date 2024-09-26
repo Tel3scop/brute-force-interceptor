@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package integration
 
 import (
@@ -26,8 +29,8 @@ type AccessSuite struct {
 }
 
 func (s *AccessSuite) SetupSuite() {
-	const Localhost = "127.0.0.1:50051"
-	host := os.Getenv("GRPC_HOST")
+	const Localhost = "localhost:50051"
+	host := os.Getenv("GRPC_ADDRESS")
 	if host == "" {
 		host = Localhost
 	}

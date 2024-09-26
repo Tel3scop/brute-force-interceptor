@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Tel3scop/brute-force-interceptor/internal/model"
-	"github.com/Tel3scop/helpers/logger"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -26,7 +25,6 @@ func (s *serv) Check(ctx context.Context, auth model.Auth) error {
 	}
 
 	if ok {
-		logger.Error("permission denied")
 		return status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 

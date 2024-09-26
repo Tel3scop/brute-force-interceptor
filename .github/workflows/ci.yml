@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linter:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.54
+          args: --timeout=30m --config=./.golangci.yaml --issues-exit-code=0
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: linter
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: go.sum
+
+      - name: Build
+        run: go build -o ./bin/ -v ./...
+
+      - name: Test
+        run: go test -v ./...
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.22
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Start integration test environment with Docker Compose
+        run: docker-compose -f docker-compose.integration.yml up -d
+
+      - name: Run unit tests
+        run: make test
+
+      - name: Run integration tests
+        run: make integration-test
+
+      - name: Drop test database
+        run: |
+          docker exec -i brute-force-integration_db_1 psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DATABASE};"
+
+      - name: Stop integration test environment with Docker Compose
+        run: docker-compose -f docker-compose.integration.yml down

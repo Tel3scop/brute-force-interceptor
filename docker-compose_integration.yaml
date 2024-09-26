@@ -1,15 +1,6 @@
-name: brute-force
+name: brute-force-integration
 
 services:
-  auth:
-    image: cr.selcloud.ru/registry/access-server:${TAG_NAME}
-    env_file:
-      - "./.env"
-    ports:
-      - "${GRPC_PORT}:${GRPC_PORT}"
-    depends_on:
-      - db
-
   app-migrator:
     build:
       dockerfile: migration.Dockerfile
@@ -19,7 +10,7 @@ services:
       - db
     restart: on-failure
     networks:
-      - anti-bruteforce-network
+      - anti-bruteforce-integration-network
 
   redis:
     image: redis:latest
@@ -34,7 +25,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - anti-bruteforce-network
+      - anti-bruteforce-integration-network
 
   db:
     image: postgres:15-alpine3.17
@@ -50,12 +41,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - anti-bruteforce-network
+      - anti-bruteforce-integration-network
 
 volumes:
   postgres_volume:
   redis-data:
 
 networks:
-  anti-bruteforce-network:
+  anti-bruteforce-integration-network:
     driver: bridge
