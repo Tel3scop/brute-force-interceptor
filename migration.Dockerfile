@@ -7,7 +7,6 @@ RUN apk update && \
 
 ADD https://github.com/pressly/goose/releases/download/v3.14.0/goose_linux_x86_64 /bin/goose
 RUN chmod +x /bin/goose
-
 WORKDIR /root
 
 # Create the migrations directory to ensure it exists
