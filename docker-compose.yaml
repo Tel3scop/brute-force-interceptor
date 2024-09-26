@@ -1,7 +1,7 @@
 name: brute-force
 
 services:
-  auth:
+  app:
     image: cr.selcloud.ru/registry/access-server:${TAG_NAME}
     env_file:
       - "./.env"
