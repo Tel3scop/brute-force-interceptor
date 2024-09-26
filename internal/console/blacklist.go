@@ -1,9 +1,6 @@
 package console
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -12,15 +9,7 @@ var (
 		Use:   "add",
 		Short: "Add to blacklist",
 		Run: func(cmd *cobra.Command, _ []string) {
-			subnet, _ := cmd.Flags().GetString("subnet")
-
-			err := accessClient.AddToBlacklist(context.Background(), subnet)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
-			}
-
-			fmt.Println("Added to blacklist successfully")
+			AddCommand(cmd, accessClient.AddToBlacklist, "Added to blacklist successfully")
 		},
 	}
 
@@ -28,31 +17,14 @@ var (
 		Use:   "remove",
 		Short: "Remove from blacklist",
 		Run: func(cmd *cobra.Command, _ []string) {
-			subnet, _ := cmd.Flags().GetString("subnet")
-
-			err := accessClient.RemoveFromBlacklist(context.Background(), subnet)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
-			}
-
-			fmt.Println("Removed from blacklist successfully")
+			RemoveCommand(cmd, accessClient.RemoveFromBlacklist, "Removed from blacklist successfully")
 		},
 	}
 )
 
 func init() {
-	blacklistAddCmd.Flags().StringP("subnet", "s", "", "Subnet to blacklist")
-	err := blacklistAddCmd.MarkFlagRequired("subnet")
-	if err != nil {
-		return
-	}
-
-	blacklistRemoveCmd.Flags().StringP("subnet", "s", "", "Subnet to blacklist")
-	err = blacklistRemoveCmd.MarkFlagRequired("subnet")
-	if err != nil {
-		return
-	}
+	InitCommand(blacklistAddCmd, "subnet", "s", "Subnet to blacklist")
+	InitCommand(blacklistRemoveCmd, "subnet", "s", "Subnet to blacklist")
 
 	blacklistCmd := &cobra.Command{
 		Use:   "blacklist",

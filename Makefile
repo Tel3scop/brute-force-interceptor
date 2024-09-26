@@ -8,7 +8,7 @@ help: ## List all available targets with help
 
 .PHONY: install-golangci-lint
 install-golangci-lint: ## install linter
-	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3
+	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54
 
 .PHONY: install-deps
 install-deps: ## install dependencies

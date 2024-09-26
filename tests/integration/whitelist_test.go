@@ -3,6 +3,12 @@ package integration
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"net"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/Tel3scop/brute-force-interceptor/pkg/access_v1"
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/suite"
@@ -10,25 +16,20 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
-	"math/rand"
-	"net"
-	"os"
-	"testing"
-	"time"
 )
 
 type WhiteListSuite struct {
 	suite.Suite
 	ctx          context.Context
-	clientConn   *grpc.ClientConn
 	accessClient access_v1.AntiBruteforceClient
 	subnet       string
 }
 
 func (s *WhiteListSuite) SetupSuite() {
+	const Localhost = "127.0.0.1:50051"
 	host := os.Getenv("GRPC_HOST")
 	if host == "" {
-		host = "127.0.0.1:50051"
+		host = Localhost
 	}
 
 	conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -39,7 +40,7 @@ func (s *WhiteListSuite) SetupSuite() {
 }
 
 func (s *WhiteListSuite) SetupTest() {
-	var seed = time.Now().UnixNano()
+	seed := time.Now().UnixNano()
 	rand.New(rand.NewSource(seed))
 	ip := gofakeit.IPv4Address()
 	mask := fmt.Sprintf("/%d", gofakeit.Number(0, 32))
@@ -49,7 +50,6 @@ func (s *WhiteListSuite) SetupTest() {
 	s.subnet = ipNet.String()
 
 	s.T().Log("seed:", seed)
-
 }
 
 func TestWhiteListSuite(t *testing.T) {
