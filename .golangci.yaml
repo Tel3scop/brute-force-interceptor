@@ -10,12 +10,11 @@ linters-settings:
       prevent_unmaintained_packages:
         list-mode: lax
         files:
-          - "**/*.go"
+          - "!**/*_a _file.go"
           - "!$test"
         allow:
           - $gostd
           - github.com/caarlos0/env/v10
-        deny: []
 
 issues:
   exclude-rules:
