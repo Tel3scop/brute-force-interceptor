@@ -27,8 +27,7 @@ type App struct {
 func NewApp(ctx context.Context) (*App, error) {
 	a := &App{}
 
-	err := a.initDeps(ctx)
-	if err != nil {
+	if err := a.initDeps(ctx); err != nil {
 		return nil, err
 	}
 
@@ -76,8 +75,7 @@ func (a *App) initDeps(ctx context.Context) error {
 }
 
 func (a *App) initConfig(_ context.Context) error {
-	_, err := config.New()
-	if err != nil {
+	if _, err := config.New(); err != nil {
 		return err
 	}
 

@@ -14,6 +14,7 @@ linters-settings:
           - "!$test"
         allow:
           - $gostd
+          - github.com/Tel3scop/*
 
 issues:
   exclude-rules:
