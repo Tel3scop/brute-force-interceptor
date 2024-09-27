@@ -72,16 +72,18 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.TEST_SERVER }}
-          known_hosts: ${{ secrets.SERVER_HOST }}
+          known_hosts: ${{ secrets.TEST_SERVER }}
       - name: Deploy with rsync
         run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./migrations/** ${{ secrets.SSH_USERNAME }}@${{ secrets.TEST_SERVER }}:~/migrations
+      - name: Copy project
+        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./** ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:~/brute-force-interceptor
       - name: Deploy to Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.TEST_SERVER }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SERVER_SSH }}
-          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,GITHUB_REF_NAME,CONTAINER_NAME,TAG_NAME
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME,TAG_NAME
           script: |
             # Set up variables
             TAG_NAME=$(echo $GITHUB_SHA | head -c5)
@@ -95,10 +97,6 @@ jobs:
             
             # Login into Registry
             cd brute-force-interceptor
-            
-            # Login into Registry
-            git checkout $GITHUB_REF_NAME
-            git pull
             
             # Run integration tests
             go test ./... -tags=integration
@@ -123,8 +121,6 @@ jobs:
           known_hosts: ${{ secrets.SERVER_HOST }}
       - name: Deploy with rsync
         run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./migrations/** ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:~/migrations
-      - name: Copy project
-        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./** ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:~/brute-force-interceptor
       - name: Deploy to Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
