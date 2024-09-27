@@ -104,12 +104,18 @@ jobs:
 
             # Run integration tests
             go test ./... -tags=integration
-
-            # Drop test database
-            docker compose exec db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
-
+            if [ $? -ne 0 ]; then
+              echo "::error::Integration tests failed"
+              exit 1
+            else
+              echo "Integration tests passed"
+            fi
+                    
             # Down containers
             docker compose -f docker-compose.yaml down
+            
+            # Remove all volumes
+            docker volume rm $(docker volume ls -q)
 
   deploy-image:
     runs-on: ubuntu-latest
