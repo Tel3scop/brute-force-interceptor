@@ -1,4 +1,5 @@
-name: lint
+name: Lint & push
+run-name: Check by linter to ${{ inputs.deploy_target }} by @${{ github.actor }}
 
 on:
   push:
@@ -7,6 +8,11 @@ on:
   pull_request:
     branches:
       - main
+
+env:
+  REGISTRY: cr.selcloud.ru/registry
+  IMAGE_NAME: "access-server"
+  CONTAINER_NAME: "access-server-container"
 
 jobs:
   linter:
@@ -40,32 +46,3 @@ jobs:
 
       - name: Test
         run: go test -v ./...
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.22
-
-      - name: Install dependencies
-        run: go mod download
-
-      - name: Start integration test environment with Docker Compose
-        run: docker compose -f docker-compose.integration.yaml up -d
-
-      - name: Run unit tests
-        run: make test
-
-      - name: Run integration tests
-        run: make integration-test
-
-      - name: Drop test database
-        run: |
-          docker exec -i brute-force-integration_db_1 psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
-
-      - name: Stop integration test environment with Docker Compose
-        run: docker compose -f docker-compose.integration.yaml down
