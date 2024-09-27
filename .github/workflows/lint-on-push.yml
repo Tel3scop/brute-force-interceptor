@@ -1,11 +1,8 @@
-name: Lint & push
+name: Lint & test
 run-name: Check by linter to ${{ inputs.deploy_target }} by @${{ github.actor }}
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 

@@ -1,7 +1,10 @@
 name: Lint & push
-run-name: Check by linter to ${{ inputs.deploy_target }} by @${{ github.actor }}
+run-name: Integration test and Push to ${{ inputs.deploy_target }} by @${{ github.actor }}
 
-on: [pull_request]
+on:
+  pull_request:
+    branches:
+      - main
 
 env:
   REGISTRY: cr.selcloud.ru/registry
@@ -104,7 +107,10 @@ jobs:
             make integration-test
 
             # Drop test database
-            docker exec -f docker-compose.integration.yaml -i db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
+            docker exec -f docker-compose.integration.yaml -i db-test psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
+            
+             # Downcontainers
+            docker compose -f docker-compose.integration.yaml down
 
   deploy-image:
     runs-on: ubuntu-latest
@@ -130,7 +136,7 @@ jobs:
             docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
 
             # Run a new container from a new image
-            docker compose up -d --force-recreate --build app 
+            docker compose up -d --force-recreate --build app
 
             # Run migrations
             docker compose up -d --force-recreate --build app-migrator
