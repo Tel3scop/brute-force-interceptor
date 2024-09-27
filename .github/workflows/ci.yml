@@ -73,9 +73,9 @@ jobs:
         with:
           key: ${{ secrets.SERVER_SSH }}
           known_hosts: ${{ secrets.TEST_SERVER }}
-      - name: Deploy with rsync
+      - name: Deploy migrations to test server
         run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./migrations/** ${{ secrets.SSH_USERNAME }}@${{ secrets.TEST_SERVER }}:~/migrations
-      - name: Copy project
+      - name: Copy project to test server
         run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./** ${{ secrets.SSH_USERNAME }}@${{ secrets.TEST_SERVER }}:~/brute-force-interceptor
       - name: Deploy to Cloud via SSH action integration
         uses: appleboy/ssh-action@v1.0.0
@@ -129,7 +129,7 @@ jobs:
         with:
           key: ${{ secrets.SERVER_SSH }}
           known_hosts: ${{ secrets.SERVER_HOST }}
-      - name: Deploy with rsync
+      - name: Deploy migrations to test server
         run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./migrations/** ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:~/migrations
       - name: Deploy to Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
