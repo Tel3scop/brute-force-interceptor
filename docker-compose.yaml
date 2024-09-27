@@ -1,0 +1,66 @@
+name: brute-force
+
+services:
+  app:
+    image: cr.selcloud.ru/registry/access-server:${TAG}
+    container_name: app
+    env_file:
+      - "./.env"
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    depends_on:
+      - db
+    networks:
+      - anti-bruteforce-network
+
+  app-migrator:
+    container_name: app-migrator
+    build:
+      dockerfile: migration.Dockerfile
+    env_file:
+      - "./migration.env"
+    depends_on:
+      - db
+    restart: on-failure
+    networks:
+      - anti-bruteforce-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    env_file:
+      - "./.env"
+    ports:
+      - "6379:${REDIS_PORT}"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: ["redis-server", "--maxmemory", "${REDIS_MAXMEMORY}", "--maxmemory-policy", "${REDIS_MAXMEMORY_POLICY}"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - anti-bruteforce-network
+
+  db:
+    image: postgres:15-alpine3.17
+    container_name: db
+    env_file:
+      - ".env"
+    ports:
+      - "5432:${POSTGRES_PORT}"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - anti-bruteforce-network
+
+volumes:
+  postgres_volume:
+  redis-data:
+
+networks:
+  anti-bruteforce-network:
+    driver: bridge

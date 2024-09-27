@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package access;
+
+option go_package = "pkg/access_v1";
+
+service AntiBruteforce {
+  rpc TryAuth(AuthRequest) returns (AuthResponse);
+  rpc ResetBucket(ResetBucketRequest) returns (ResetBucketResponse);
+  rpc AddToBlacklist(AddToBlacklistRequest) returns (AddToBlacklistResponse);
+  rpc RemoveFromBlacklist(RemoveFromBlacklistRequest) returns (RemoveFromBlacklistResponse);
+  rpc AddToWhitelist(AddToWhitelistRequest) returns (AddToWhitelistResponse);
+  rpc RemoveFromWhitelist(RemoveFromWhitelistRequest) returns (RemoveFromWhitelistResponse);
+}
+
+message AuthRequest {
+  string login = 1;
+  string password = 2;
+  string ip = 3;
+}
+
+message AuthResponse {
+  bool ok = 1;
+}
+
+message ResetBucketRequest {
+  string login = 1;
+  string ip = 2;
+}
+
+message ResetBucketResponse {}
+
+message AddToBlacklistRequest {
+  string subnet = 1;
+}
+
+message AddToBlacklistResponse {}
+
+message RemoveFromBlacklistRequest {
+  string subnet = 1;
+}
+
+message RemoveFromBlacklistResponse {}
+
+message AddToWhitelistRequest {
+  string subnet = 1;
+}
+
+message AddToWhitelistResponse {}
+
+message RemoveFromWhitelistRequest {
+  string subnet = 1;
+}
+
+message RemoveFromWhitelistResponse {}

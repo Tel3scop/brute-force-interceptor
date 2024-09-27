@@ -1,0 +1,156 @@
+name: Lint & push
+run-name: Integration test and Push to ${{ inputs.deploy_target }} by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: cr.selcloud.ru/registry
+  IMAGE_NAME: "access-server"
+  CONTAINER_NAME: "access-server-container"
+
+jobs:
+  linter:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.54
+          args: --timeout=30m --config=./.golangci.yaml --issues-exit-code=0
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: linter
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: go.sum
+
+      - name: Build
+        run: go build -o ./bin/ -v ./...
+
+      - name: Test
+        run: go test -v ./...
+  image-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+      - name: Build and Push Docker Image
+        run: |
+          TAG_NAME=$(echo $GITHUB_SHA | head -c5)
+          docker buildx create --use
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: image-build-and-push
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SERVER_SSH }}
+          known_hosts: ${{ secrets.TEST_SERVER }}
+      - name: Deploy migrations to test server
+        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./migrations/** ${{ secrets.SSH_USERNAME }}@${{ secrets.TEST_SERVER }}:~/migrations
+      - name: Copy project to test server
+        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./** ${{ secrets.SSH_USERNAME }}@${{ secrets.TEST_SERVER }}:~/brute-force-interceptor
+      - name: Deploy to Cloud via SSH action integration
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.TEST_SERVER }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SERVER_SSH }}
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME,TAG_NAME
+          script: |
+            # Set up variables
+            TAG_NAME=$(echo $GITHUB_SHA | head -c5)
+            sed -i "s/TAG_NAME=.*/TAG_NAME=$TAG_NAME/" ./.env
+            source ~/.profile
+            
+            # Login into Registry
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+            
+            # Pull registry container
+            docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
+
+            # Run a new container from a new image
+            docker compose -f docker-compose.yaml up -d --force-recreate --build
+
+            # Login into Registry
+            cd brute-force-interceptor
+
+            # Run integration tests
+            go test ./... -tags=integration
+            if [ $? -ne 0 ]; then
+              echo "::error::Integration tests failed"
+              exit 1
+            else
+              echo "Integration tests passed"
+            fi
+                    
+            # Down containers
+            docker compose -f docker-compose.yaml down
+            
+            # Remove all volumes
+            docker volume rm $(docker volume ls -q)
+
+  deploy-image:
+    runs-on: ubuntu-latest
+    needs: integration-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SERVER_SSH }}
+          known_hosts: ${{ secrets.SERVER_HOST }}
+      - name: Deploy migrations to test server
+        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./migrations/** ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:~/migrations
+      - name: Deploy to Cloud via SSH action
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SERVER_SSH }}
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME,TAG_NAME
+          script: |
+            # Set up variables
+            TAG_NAME=$(echo $GITHUB_SHA | head -c5)
+            sed -i "s/TAG_NAME=.*/TAG_NAME=$TAG_NAME/" ./.env
+
+            # Login into Registry
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+            # Pull new registry container
+            docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
+
+            # Run a new container from a new image
+            docker compose up -d --force-recreate --build app
+
+            # Run migrations
+            docker compose up -d --force-recreate --build app-migrator

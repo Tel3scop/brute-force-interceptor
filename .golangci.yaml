@@ -5,13 +5,40 @@ linters-settings:
   funlen:
     lines: 150
     statements: 80
+  depguard:
+    rules:
+      prevent_unmaintained_packages:
+        list-mode: lax
+        files:
+          - "!**/*_a _file.go"
+          - "!$test"
+        allow:
+          - $gostd
+          - github.com/caarlos0/env/v10
+          - github.com/jackc/pgconn
+          - github.com/go-redis/redis/v8
+          - github.com/Tel3scop/brute-force-interceptor
+          - github.com/Masterminds/squirrel
+          - github.com/Tel3scop/helpers
+          - github.com/jackc/pgx
+          - github.com/georgysavva/scany
+          - github.com/pkg/errors
+          - github.com/grpc-ecosystem
+          - github.com/spf13/cobra
 
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
 linters:
   disable-all: true
   enable:
     - asciicheck
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl

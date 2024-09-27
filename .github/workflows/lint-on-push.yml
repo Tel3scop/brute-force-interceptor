@@ -1,7 +1,15 @@
-name: Lint push
+name: Lint & test
 run-name: Check by linter to ${{ inputs.deploy_target }} by @${{ github.actor }}
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  REGISTRY: cr.selcloud.ru/registry
+  IMAGE_NAME: "access-server"
+  CONTAINER_NAME: "access-server-container"
 
 jobs:
   linter:
@@ -18,3 +26,20 @@ jobs:
         with:
           version: v1.54
           args: --timeout=30m --config=./.golangci.yaml --issues-exit-code=0
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: linter
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: go.sum
+
+      - name: Build
+        run: go build -o ./bin/ -v ./...
+
+      - name: Test
+        run: go test -v ./...
