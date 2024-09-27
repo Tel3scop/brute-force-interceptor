@@ -12,7 +12,6 @@ services:
       - db
     networks:
       - anti-bruteforce-integration-network
-      -
   app-migrator:
     build:
       dockerfile: migration.Dockerfile
