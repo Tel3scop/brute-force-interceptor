@@ -1,6 +1,14 @@
 name: brute-force-integration
 
 services:
+  app:
+    image: cr.selcloud.ru/registry/access-server:${TAG_NAME}
+    env_file:
+      - "./integration.env"
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    depends_on:
+      - db
   app-migrator:
     build:
       dockerfile: migration.Dockerfile
