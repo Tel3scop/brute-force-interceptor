@@ -1,7 +1,7 @@
 name: brute-force-integration
 
 services:
-  app:
+  app-test:
     image: cr.selcloud.ru/registry/access-server:${TAG_NAME}
     container_name: app-test
     env_file:
@@ -25,7 +25,7 @@ services:
     networks:
       - anti-bruteforce-integration-network
 
-  redis:
+  redis-test:
     image: redis:latest
     container_name: redis-test
     env_file:
@@ -40,13 +40,13 @@ services:
     networks:
       - anti-bruteforce-integration-network
 
-  db:
+  db-test:
     image: postgres:15-alpine3.17
     container_name: db-test
     env_file:
       - "./integration/.env"
     ports:
-      - "5432:5432"
+      - "5432:${POSTGRES_PORT}"
     volumes:
       - postgres_volume_test:/var/lib/postgresql/data
     healthcheck:

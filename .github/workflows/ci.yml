@@ -101,7 +101,7 @@ jobs:
             docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
 
             # Run a new container from a new image
-            docker compose -f docker-compose.integration.yaml up -d
+            docker compose -f docker-compose.integration.yaml up -d --force-recreate --build
 
             # Run integration tests
             make integration-test
