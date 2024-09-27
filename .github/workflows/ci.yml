@@ -93,7 +93,7 @@ jobs:
             # Login into Registry
             docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
             
-            # Pull new registry container
+            # Pull registry container
             docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
 
             # Run a new container from a new image
