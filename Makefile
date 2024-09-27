@@ -116,3 +116,14 @@ docker-build: ## build for CI/CD
 	docker buildx build --no-cache --platform linux/amd64 -t <REGISTRY>/access-server:v0.0.1 .
 	docker login -u <REGISTRY_USERNAME> -p <REGISTRY_PASSWORD> <REGISTRY>
 	docker push  <REGISTRY>/access-server:v0.0.1
+
+
+.PHONY: build
+build: ## Build the project using docker-compose
+	docker login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} ${REGISTRY}
+	sh update_tag.sh
+	docker-compose build
+
+.PHONY: run
+run: ## Run the project using docker-compose
+	docker-compose up -d

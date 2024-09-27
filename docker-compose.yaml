@@ -2,15 +2,19 @@ name: brute-force
 
 services:
   app:
-    image: cr.selcloud.ru/registry/access-server:${TAG_NAME}
+    image: cr.selcloud.ru/registry/access-server:${TAG}
+    container_name: app
     env_file:
       - "./.env"
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
     depends_on:
       - db
+    networks:
+      - anti-bruteforce-network
 
   app-migrator:
+    container_name: app-migrator
     build:
       dockerfile: migration.Dockerfile
     env_file:
@@ -38,10 +42,11 @@ services:
 
   db:
     image: postgres:15-alpine3.17
+    container_name: db
     env_file:
       - ".env"
     ports:
-      - "5432:5432"
+      - "5432:${POSTGRES_PORT}"
     volumes:
       - postgres_volume:/var/lib/postgresql/data
     healthcheck:
