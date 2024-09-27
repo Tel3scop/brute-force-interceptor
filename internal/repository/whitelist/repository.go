@@ -2,7 +2,6 @@ package whitelist
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 
 	sq "github.com/Masterminds/squirrel"
@@ -10,6 +9,7 @@ import (
 	"github.com/Tel3scop/brute-force-interceptor/internal/model"
 	"github.com/Tel3scop/brute-force-interceptor/internal/repository"
 	"github.com/Tel3scop/helpers/logger"
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -99,9 +99,9 @@ func (r *repo) IsInList(ctx context.Context, ip string) (bool, error) {
 	}
 
 	var exists int
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&exists)
+	err = r.db.DB().ScanOneContext(ctx, &exists, q, args...)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return false, nil
 		}
 		logger.Error(err.Error())
