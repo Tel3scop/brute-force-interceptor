@@ -104,7 +104,7 @@ jobs:
             # Run integration tests
             go test ./... -tags=integration
 
-            # Drop test database
+            # Drop database
             docker compose exec db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
 
             # Down containers
