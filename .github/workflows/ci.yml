@@ -83,29 +83,29 @@ jobs:
           host: ${{ secrets.TEST_SERVER }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SERVER_SSH }}
-#          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME,TAG_NAME
-#          script: |
-#            # Set up variables
-#            TAG_NAME=$(echo $GITHUB_SHA | head -c5)
-#            sed -i "s/TAG_NAME=.*/TAG_NAME=$TAG_NAME/" ./.env
-#
-#           # Pull new registry container
-#            docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
-#
-#            # Run a new container from a new image
-#            docker compose -f docker-compose.yaml up -d --force-recreate --build
-#
-#            # Login into Registry
-#            cd brute-force-interceptor
-#
-#            # Run integration tests
-#            go test ./... -tags=integration
-#
-#            # Drop test database
-#            docker exec -i db-test psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
-#
-#            # Down containers
-#            docker compose -f docker-compose.integration.yaml down
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME,TAG_NAME
+          script: |
+            # Set up variables
+            TAG_NAME=$(echo $GITHUB_SHA | head -c5)
+            sed -i "s/TAG_NAME=.*/TAG_NAME=$TAG_NAME/" ./.env
+
+            # Pull new registry container
+            docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
+
+            # Run a new container from a new image
+            docker compose -f docker-compose.yaml up -d --force-recreate --build
+
+            # Login into Registry
+            cd brute-force-interceptor
+
+            # Run integration tests
+            go test ./... -tags=integration
+
+            # Drop test database
+            docker exec -i db-test psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
+
+            # Down containers
+            docker compose -f docker-compose.integration.yaml down
 
   deploy-image:
     runs-on: ubuntu-latest
