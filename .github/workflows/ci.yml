@@ -89,6 +89,9 @@ jobs:
             TAG_NAME=$(echo $GITHUB_SHA | head -c5)
             sed -i "s/TAG_NAME=.*/TAG_NAME=$TAG_NAME/" ./.env
 
+            # Login into Registry
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+            
             # Pull new registry container
             docker pull $REGISTRY/$IMAGE_NAME:$TAG_NAME
 
