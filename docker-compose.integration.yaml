@@ -3,12 +3,16 @@ name: brute-force-integration
 services:
   app:
     image: cr.selcloud.ru/registry/access-server:${TAG_NAME}
+    container_name: app
     env_file:
       - "./integration.env"
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
     depends_on:
       - db
+    networks:
+      - anti-bruteforce-integration-network
+      -
   app-migrator:
     build:
       dockerfile: migration.Dockerfile
@@ -37,6 +41,7 @@ services:
 
   db:
     image: postgres:15-alpine3.17
+    container_name: db
     env_file:
       - "./integration.env"
     ports:

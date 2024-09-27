@@ -104,7 +104,7 @@ jobs:
             make integration-test
 
             # Drop test database
-            docker exec -i brute-force-integration_db_1 psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
+            docker exec -f docker-compose.integration.yaml -i db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
 
   deploy-image:
     runs-on: ubuntu-latest
