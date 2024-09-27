@@ -105,7 +105,7 @@ jobs:
             go test ./... -tags=integration
 
             # Drop test database
-            docker exec -i db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
+            docker compose exec db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
 
             # Down containers
             docker compose -f docker-compose.integration.yaml down
