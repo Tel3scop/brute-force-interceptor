@@ -2,7 +2,7 @@ name: Lint & push
 run-name: Integration test and Push to ${{ inputs.deploy_target }} by @${{ github.actor }}
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
