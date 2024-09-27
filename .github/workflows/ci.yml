@@ -88,7 +88,8 @@ jobs:
             # Set up variables
             TAG_NAME=$(echo $GITHUB_SHA | head -c5)
             sed -i "s/TAG_NAME=.*/TAG_NAME=$TAG_NAME/" ./.env
-
+            source ~/.profile
+            
             # Login into Registry
             docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
             
@@ -108,7 +109,7 @@ jobs:
             docker compose exec db psql -U ${POSTGRES_USER} -c "DROP DATABASE ${POSTGRES_DB};"
 
             # Down containers
-            docker compose -f docker-compose.integration.yaml down
+            docker compose -f docker-compose.yaml down
 
   deploy-image:
     runs-on: ubuntu-latest
